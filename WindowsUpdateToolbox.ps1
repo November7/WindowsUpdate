@@ -12,9 +12,10 @@ function Show-Menu {
     Write-Host "[2] Check available updates"
     Write-Host "[3] Install specific KB update"
     Write-Host "[4] Show update history"
-    Write-Host "[5] Clear update cache"
-    Write-Host "[6] Check Windows Update service status"
-    Write-Host "[7] Disable automatic updates (registry)"
+    Write-Host "[5] Show update details"
+    Write-Host "[6] Clear update cache"
+    Write-Host "[7] Check Windows Update service status"
+    Write-Host "[8] Disable automatic updates (registry)"
     Write-Host "[0] Exit"
     Write-Host "==============================="
 }
@@ -48,6 +49,15 @@ function Show-UpdateHistory {
     Pause
 }
 
+function Show-UpdateHistoryDetails {
+    Import-Module PSWindowsUpdate
+    Write-Host "Update history details:`n"    
+    $kb = Read-Host "Enter KB update number (e.g. KB5029263)"
+    $pattern = "*$kb*"      
+    Get-WUHistory | Where-Object { $_.Title -like $pattern } | Format-Table Date, Title, Result    
+    Pause
+}
+
 function Clear-UpdateCache {
     Write-Host "Stopping Windows Update service..."
     Stop-Service -Name wuauserv -Force
@@ -75,6 +85,8 @@ function Disable-AutoUpdates {
     Pause
 }
 
+
+
 do {
     Show-Menu
     $choice = Read-Host "Choose an option"
@@ -83,10 +95,11 @@ do {
         "2" { Check-AvailableUpdates }
         "3" { Install-SpecificKB }
         "4" { Show-UpdateHistory }
-        "5" { Clear-UpdateCache }
-        "6" { Check-ServiceStatus }
-        "7" { Disable-AutoUpdates }
-        "0" { Write-Host "Closing..."; break }
+        "5" { Show-UpdateHistoryDetails }
+        "6" { Clear-UpdateCache }
+        "7" { Check-ServiceStatus }
+        "8" { Disable-AutoUpdates }
+        "0" { Write-Host "Closing..."; exit }
         default { Write-Host "Invalid selection. Please try again."; Pause }
     }
 } while ($true)
