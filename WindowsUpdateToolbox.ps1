@@ -11,11 +11,12 @@ function Show-Menu {
     Write-Host "[1] Install PSWindowsUpdate module"
     Write-Host "[2] Check available updates"
     Write-Host "[3] Install specific KB update"
-    Write-Host "[4] Show update history"
-    Write-Host "[5] Show update details"
-    Write-Host "[6] Clear update cache"
-    Write-Host "[7] Check Windows Update service status"
-    Write-Host "[8] Disable automatic updates (registry)"
+    Write-Host "[4] Install specific update by name"
+    Write-Host "[5] Show update history"
+    Write-Host "[6] Show update details"
+    Write-Host "[7] Clear update cache"
+    Write-Host "[8] Check Windows Update service status"
+    Write-Host "[9] Disable automatic updates (registry)"
     Write-Host "[0] Exit"
     Write-Host "==============================="
 }
@@ -31,7 +32,7 @@ function Install-PSWindowsUpdate {
 function Check-AvailableUpdates {
     Import-Module PSWindowsUpdate
     Write-Host "Available updates:`n"
-    Get-WindowsUpdate
+    Get-WindowsUpdate | Format-Table -AutoSize
     Pause
 }
 
@@ -42,10 +43,17 @@ function Install-SpecificKB {
     Pause
 }
 
+function Install-UpdateByName {
+    Import-Module PSWindowsUpdate
+    $title = Read-Host "Enter update Name (Title)"
+    Install-WindowsUpdate -Title $title -AcceptAll -AutoReboot
+    Pause
+}
+
 function Show-UpdateHistory {
     Import-Module PSWindowsUpdate
     Write-Host "Update history:`n"
-    Get-WUHistory | Format-Table Date, KB, Result, UpdateType -AutoSize
+    Get-WUHistory | Format-Table Date, KB, Title, Result, UpdateType -AutoSize
     Pause
 }
 
@@ -94,11 +102,12 @@ do {
         "1" { Install-PSWindowsUpdate }
         "2" { Check-AvailableUpdates }
         "3" { Install-SpecificKB }
-        "4" { Show-UpdateHistory }
-        "5" { Show-UpdateHistoryDetails }
-        "6" { Clear-UpdateCache }
-        "7" { Check-ServiceStatus }
-        "8" { Disable-AutoUpdates }
+        "4" { Install-UpdateByName }
+        "5" { Show-UpdateHistory }
+        "6" { Show-UpdateHistoryDetails }
+        "7" { Clear-UpdateCache }
+        "8" { Check-ServiceStatus }
+        "9" { Disable-AutoUpdates }
         "0" { Write-Host "Closing..."; exit }
         default { Write-Host "Invalid selection. Please try again."; Pause }
     }
